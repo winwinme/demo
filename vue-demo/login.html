@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+  >
+  <meta
+      http-equiv="X-UA-Compatible"
+      content="ie=edge"
+  >
+  <title>login</title>
+  <script src="./lib/vue-2.4.0.js"></script>
+  <link
+      rel="stylesheet"
+      href="./lib/bootstrap-3.3.7.css"
+  >
+  <style>
+    body { padding: 15px; }
+
+    .panel-heading a{
+      color: white
+    }
+
+    .v-enter,.v-leave-to {
+      opacity: 0;
+      transform: translateX(80px);
+    }
+
+    .v-enter-active, .v-leave-actve {
+      transition: all .6s ease;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <a href="" @click.prevent="comName = 'login'">登录</a> |
+      <a href="" @click.prevent="comName = 'register'">注册</a>
+    </div>
+    <div class="panel-body">
+      <transition mode="out-in" appear>
+        <component :is="comName"></component>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<template id="tpl1">
+  <div class="form-inline">
+    <h4>这是登录组件</h4>
+
+    fullName:<input type="text" v-model="firstName"> +
+    <input type="text" v-model="lastName"> =
+    <input type="text" v-model="fullName">
+  </div>
+</template>
+<template id="tpl2">
+  <div class="form-inline">
+    <h4>这是注册组件</h4>
+
+    全名：<input type="text" v-model="firstName2" @keyup='getFullName'> +
+    <input type="text" v-model="lastName2" @keyup='getFullName'> =
+    <input type="text" v-model="fullName2">
+  </div>
+</template>
+</body>
+<script>
+
+  // Vue.component('login', {
+  const login = {
+    template: '#tpl1',
+    data:function() {
+      return {
+        firstName: '',
+        lastName: '',
+        // fullName: '',
+      }
+    },
+    watch: {
+      //监听方式1：watch
+      // firstName(newVal, oldVal) {
+      // console.log(newVal,'--', oldVal)
+      //   this.fullName = this.firstName + this.lastName;
+      // },
+      // lastName() {
+      //   this.fullName = this.firstName + this.lastName;
+      // }
+    },
+    computed: {
+      //监听方式2：computed
+      fullName() {
+        const { firstName, lastName} = this;
+        return `${firstName}-${lastName}`;
+      }
+    }
+  }
+  // );
+
+  const register = {
+    template: '#tpl2',
+    data:function() {
+      return {
+        firstName2: '',
+        lastName2: '',
+        fullName2: '',
+      }
+    },
+    methods: {
+      //监听方式3：keyup
+      getFullName() {
+        this.fullName2 = this.firstName2 + this.lastName2;
+      }
+    }
+  };
+
+  const vm = new Vue({
+    el: '#app',
+    data: {
+      comName: 'login',
+    },
+    methods: {},
+    //在页面中用commponents渲染多个组件；
+    components: {
+      register,
+         login,
+    }
+    //在页面中用render渲染组件，整个替换app
+    // render(createElement) {
+    //   return createElement(login);
+    // }
+    // 简写render
+    // render: c => c(register),
+  });
+</script>
+</html>

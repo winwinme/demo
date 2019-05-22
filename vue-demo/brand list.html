@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+  >
+  <meta
+      http-equiv="X-UA-Compatible"
+      content="ie=edge"
+  >
+  <title>Brand List</title>
+  <script src="./lib/vue-2.4.0.js"></script>
+  <script src="./lib/vue-resource-1.3.4.js"></script>
+  <link
+      rel="stylesheet"
+      href="./lib/bootstrap-3.3.7.css"
+  >
+  <style>
+    body {
+      padding: 15px;
+    }
+    /*.v-enter,.v-leave-to {*/
+      /*opacity: 0;*/
+      /*transform: translateX(150px);*/
+    /*}*/
+    /*.v-enter-active, .v-leave-active {*/
+      /*transition: all .8s ease;*/
+    /*}*/
+    h3 {
+      color:red;
+    }
+    /* v-enter 【这是一个时间点】 是进入之前，元素的起始状态，此时还没有开始进入 */
+    /* v-leave-to 【这是一个时间点】 是动画离开之后，离开的终止状态，此时，元素 动画已经结束了 */
+    .v-enter,
+    .v-leave-to {
+      opacity: 0;
+      transform: translateX(150px);
+    }
+
+    /* v-enter-active 【入场动画的时间段】 */
+    /* v-leave-active 【离场动画的时间段】 */
+    .v-enter-active,
+    .v-leave-active{
+      transition: all 0.8s ease;
+    }
+
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">Add Brand</div>
+    <!--<h4>{{ msg | msgForm }}</h4>-->
+
+    <div class="panel-body form-inline">
+      <label>
+        Id：
+        <input
+            type="text"
+            class="form-control"
+            v-model="id"
+        >
+      </label>
+      <label>
+        Name：
+        <input
+            type="text"
+            class="form-control"
+            v-model="name"
+        >
+      </label>
+      <button
+          class="btn btn-primary"
+          @click="add"
+      >Add
+      </button>
+      <label>
+        Keyword：
+        <input
+            type="text"
+            class="form-control"
+            v-model="keyword"
+            v-focus
+        >
+      </label>
+    </div>
+  </div>
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">Brand List</div>
+    <div class="panel-body">
+      <table class="table table-bordered table-striped table-hover">
+        <tr>
+          <th>ID</th>
+          <th>NAME</th>
+          <th>TIME</th>
+          <th>OPT</th>
+        </tr>
+        <tr
+            v-for="item in search()"
+            :key="item.id"
+        >
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.time | dateFormat('yyyy-mm-dd hh:mm') }}</td>
+          <td>
+            <a
+                href="#"
+                @click="del(item.id)"
+            >delete
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <input type="button" class="btn btn-danger" value="show" @click="flag=!flag">
+    <transition>
+      <h3 v-if="flag">{{ msg }}</h3>
+    </transition>
+  </div>
+</div>
+</body>
+<script>
+  // 请求配置
+  // Vue.http.options.root = 'http://vue.studyit.io/';
+  // Vue.http.options.emulateJSON = true;
+
+  // 全局过滤器，VM实例共享
+  // test filter
+  // Vue.filter('msgForm', function(value) {
+  //   return value.replace('something', 'car');
+  // });
+
+  // 全局过滤器，进行时间的格式化
+  Vue.filter('dateFormat', function(dateStr, pattern = '') {
+    const dv = new Date();
+    const y = dv.getFullYear();
+    const m = (dv.getMonth() + 1).toString().padStart(2, '0');
+    const d = dv.getDay().toString().padStart(2, '0');
+
+    if (pattern.toLowerCase() == 'yyyy-mm-dd') {
+      return `${y}-${m}-${d}`;
+    } else {
+      const hh = dv.getHours().toString().padStart(2, '0');
+      const mm = dv.getMinutes().toString().padStart(2, '0');
+      return `${y}-${m}-${d} ${hh}:${mm}`;
+
+    }
+
+  });
+
+  // 全局指令
+  Vue.directive('focus', {
+    bind: function(el) {
+      //指令绑定元素
+    },
+    inserted: function(el) {
+      // 插入DOM后，与JS行为有关，触发一次
+      el.focus();
+    },
+    updated: function(el) {
+      // VNode更新执行，可触发多次
+    }
+  });
+
+  // new vm
+  var vm = new Vue({
+    el: '#app',
+    data: {
+      id: '',
+      name: '',
+      keyword: '',
+      flag: false,
+      list: [
+        // 1.本地 mock
+        { id: 1, name: '奔驰', time: new Date() },
+        { id: 2, name: '宝马', time: new Date() },
+      ],
+      msg: 'the something brand in here!!',
+    },
+    created: function() {
+      // this.getAllList();
+    },
+    methods: {
+      // 服务器中获取列表
+      getAllList() {
+        console.log(this)
+        this.$http.get('api/getprodlist').then(result => {
+          console.log('/api/getprodlist', result.body)
+
+        });
+      },
+      // 添加
+      add() {
+        const { id, name, list, $http } = this;
+        if (!id || !name) {
+          alert('请输入完整信息');
+        } else {
+          // 1.本地Mock test
+          const newItem = { id, name, time: new Date() };
+          list.push(newItem);
+
+          // 2.post服务器中添加列表
+          // $http.post('api/addproduct', { name }).then(result => {
+          //   console.log('api/addproduct', result.body)
+          // });
+
+          this.id = '';
+          this.name = '';
+        }
+      },
+      // 删除
+      del(id) {
+        const { list } = this;
+        // 1.本地 mock
+        // 1）some 有特殊处理的情况
+        // this.list.some((item,index) => {
+        //   if(item.id == id) {
+        //     this.list.splice(index,1);
+        //     return true;
+        //   }
+        // })
+
+        // 2) 直接拿到索引
+        const index = list.findIndex(item => item.id == id);
+        list.splice(index, 1);
+
+        // 2.服务器中删除列表.
+        // this.$http.get('/api/delproduct' + id).then(result => {
+        //   console.log('/api/delproduct', result.body)
+        // });
+
+      },
+      // 搜索
+      search() {
+        const { list, keyword } = this;
+        return list.filter(({ name }) => name.indexOf(keyword) > -1);
+      },
+    },
+    filters: {
+      // 定义私有过滤器（优先调用私有）
+    },
+    directives: {
+      // 定义私有指令（优先调用私有）
+    },
+  });
+
+</script>
+</html>

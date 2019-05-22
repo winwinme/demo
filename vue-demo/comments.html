@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+  >
+  <meta
+      http-equiv="X-UA-Compatible"
+      content="ie=edge"
+  >
+  <title>comment</title>
+  <script src="./lib/vue-2.4.0.js"></script>
+  <link
+      rel="stylesheet"
+      href="./lib/bootstrap-3.3.7.css"
+  >
+  <style>
+    body {
+      padding: 15px;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">评论区域</div>
+    <div class="panel-body">
+
+      <comment @refresh="getAllList"></comment>
+
+      <hr>
+
+      <ul class="media-list">
+        <li
+            class="media"
+            v-for="item in list"
+        >
+          <div class="media-left">
+            <a
+                href="#"
+                @click.prevent
+            >
+              <img
+                  class="media-object"
+                  width="64"
+                  height="64"
+                  src="https://avatars0.githubusercontent.com/u/8731254?s=40&v=4"
+              >
+            </a>
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">{{ item.user }}</h4>
+            {{ item.content }}
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+
+<template id="tpl1">
+  <div>
+    <div class="form-group">
+      <label>评论用户：</label>
+      <input
+          type="text"
+          class="form-control"
+          v-model="user"
+      >
+    </div>
+    <div class="form-group">
+      <label>评论内容：</label>
+      <textarea
+          class="form-control"
+          v-model="content"
+      ></textarea>
+    </div>
+    <div class="form-group">
+      <button
+          class="btn btn-primary"
+          @click="comment"
+      >发表评论
+      </button>
+    </div>
+  </div>
+</template>
+</body>
+
+<script>
+
+  Vue.component('comment', {
+    template: '#tpl1',
+    data: function() {
+      return {
+        user: '',
+        content: '',
+      };
+    },
+    methods: {
+      comment() {
+        // 1. get user,content
+        // 2. get list from localStorage
+        // 3. add item, set localStorage
+        // 4. refresh list
+        // 5. empty input
+        const { user, content } = this;
+        const commentItem = { user, content };
+        const list = JSON.parse(localStorage.getItem('cnts')) || [];
+        list.unshift(commentItem);
+        localStorage.setItem('cnts', JSON.stringify(list));
+        // refresh
+        this.$emit('refresh');
+        this.user = this.content = '';
+      },
+    },
+  });
+
+  var vm = new Vue({
+    el: '#app',
+    data: {
+      list: [
+        // { user: '李白', content: '窗前明月光,窗前明月光窗前明月光窗前明月光' },
+        // { user: '豆腐', content: '豆腐西施在此,豆腐西施在此豆腐西施在此' },
+        // { user: '小白', content: '白又白，小白白,小白白' },
+      ],
+    },
+    created: function() {
+      this.getAllList();
+    },
+    methods: {
+      getAllList() {
+        this.list = JSON.parse(localStorage.getItem('cnts')) || [];
+      },
+    },
+  });
+</script>
+</html>
