@@ -1,0 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+h1 {
+  margin: 5px;
+}
+.list {
+  li {
+    border: 1px dashed darkgray;
+    padding: 15px;
+    margin: 8px;
+    font-size: 12px;
+    line-height: 22px;
+  }
+}
+
+.title {
+  font-weight: bold;
+  color: cornflowerblue;
+}
