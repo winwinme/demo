@@ -1,0 +1,44 @@
+* {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+input, textarea, button {
+  padding: 5px;
+  margin: 5px 10px;
+  width: 300px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.list {
+  li {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 5px;
+    margin: 8px;
+    font-size: 12px;
+    line-height: 22px;
+  }
+}
+
+.title {
+  font-size: 18px;
+  margin: 15px 0 5px 10px;
+  color: cornflowerblue;
+}
+
+.user {
+  font-weight: bold;
+  color: cornflowerblue;
+}
+
+.cmtWrap {
+  margin: 0 0 15px 0;
+}
+
+.btn {
+  background: cornflowerblue;
+  color: #fff;
+  border: none;
+}
